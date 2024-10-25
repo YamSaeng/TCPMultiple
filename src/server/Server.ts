@@ -1,13 +1,19 @@
 import net from "net";
+import protobuf from "protobufjs";
 import { config } from "../config/Config.js";
 import { OnData } from "../events/OnData.js";
 import { OnEnd } from "../events/OnEnd.js";
 import { OnError } from "../events/OnError.js";
+import FileParser from "../FileParser.js";
+import { packetNames } from "../protobuf/packetNames.js";
+import DatabaseManager from "../Managers/DatabaseManager.js";
 
 class GameServer {
     public recvCount: number;
     public sendCount: number;
     private server: any;
+
+    private protoMessages: { [key: string]: any } = {};
 
     constructor() {
         this.recvCount = 0;
@@ -15,8 +21,42 @@ class GameServer {
         this.server = net.createServer(this.Accept);
     }
 
+    CreateSchemas() {
+        DatabaseManager.GetInstance().CreateSchemas();        
+    }
+
+    async LoadProtos() {
+        try {
+            const protoFilesDir = FileParser.GetInstance().GetDir("./protobuf");
+            const protoFiles = FileParser.GetInstance().GetAllFiles(protoFilesDir, ".proto");
+
+            // protobuf 객체를 생성
+            const root = new protobuf.Root();
+            // protobuf를 이용해 proto를 로드
+            await Promise.all(protoFiles.map((file: any) => root.load(file)));            
+
+            for (const [pacakageName, types] of Object.entries(packetNames)) {
+                this.protoMessages[pacakageName] = {};
+                for (const [type, typeName] of Object.entries(types)) {
+                    this.protoMessages[pacakageName][type] = root.lookupType(typeName);
+                }
+            }
+
+            console.log("Protobuf 파일을 로드했습니다.");
+        } catch (error) {
+            console.error("Protobuf 파일 로드 중 오류가 발생했습니다.", error);
+        }
+    }
+
+    GetProtoMessages() {
+        return { ...this.protoMessages };
+    }
+
     StartGameServer() {
         console.log("게임서버 시작");
+
+        this.CreateSchemas();
+        this.LoadProtos();
 
         this.Listen();
     }
