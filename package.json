@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "main.js",
   "license": "MIT",
+  "type": "module",
   "scripts": {
     "gameServerStart": "tsc && node ./dist/main.js",
     "clientStart":"tsc && node ./dist/client/client.js",
