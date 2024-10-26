@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "gameServerStart": "tsc && node ./dist/main.js",
-    "clientStart":"tsc && node ./dist/client/client.js",
+    "clientStart": "tsc && node ./dist/client/client.js",
     "build": "tsc --build",
     "clean": "tsc --build --clean"
   },
@@ -18,6 +18,7 @@
     "uuid": "^10.0.0"
   },
   "devDependencies": {
+    "@types/uuid": "^10.0.0",
     "nodemon": "^3.1.7"
   }
 }
