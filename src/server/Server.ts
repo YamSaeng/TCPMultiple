@@ -9,13 +9,24 @@ import { packetNames } from "../protobuf/packetNames.js";
 import DatabaseManager from "../Managers/DatabaseManager.js";
 
 class GameServer {
+    private static gInstance: any = null;
+
     public recvCount: number;
     public sendCount: number;
     private server: any;
 
     private protoMessages: { [key: string]: any } = {};
 
-    constructor() {
+    static GetInstance() {
+        if(GameServer.gInstance == null)
+        {
+            GameServer.gInstance = new GameServer();
+        }
+
+        return GameServer.gInstance;
+    }
+
+    private constructor() {
         this.recvCount = 0;
         this.sendCount = 0;
         this.server = net.createServer(this.Accept);
@@ -70,6 +81,9 @@ class GameServer {
 
     Accept(socket: any) {
         console.log("클라 접속", socket.remoteAddress, socket.remotePort);
+
+        // 소켓 객체마다 buffer 속성을 추가해 각 클라마다 고유한 버퍼를 유지하도록 함
+        socket.buffer = Buffer.alloc(0);
 
         socket.on("data", OnData(socket));
         socket.on("end", OnEnd(socket));
