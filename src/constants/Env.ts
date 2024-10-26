@@ -11,3 +11,6 @@ export const DB1_USER = process.env.DB1_USER || 'user1';
 export const DB1_PASSWORD = process.env.DB1_PASSWORD || 'password1';
 export const DB1_HOST = process.env.DB1_HOST || 'localhost';
 export const DB1_PORT = process.env.DB1_PORT || 3306;
+
+export const TOTAL_LENGTH = 4;
+export const PACKET_TYPE_LENGTH = 1;
