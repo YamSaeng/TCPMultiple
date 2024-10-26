@@ -7,6 +7,7 @@ import { OnError } from "../events/OnError.js";
 import FileParser from "../FileParser.js";
 import { packetNames } from "../protobuf/packetNames.js";
 import DatabaseManager from "../Managers/DatabaseManager.js";
+import User from "../user/User.js";
 
 class GameServer {
     private static gInstance: any = null;
@@ -17,9 +18,10 @@ class GameServer {
 
     private protoMessages: { [key: string]: any } = {};
 
+    private userSessions: any[] = [];
+
     static GetInstance() {
-        if(GameServer.gInstance == null)
-        {
+        if (GameServer.gInstance == null) {
             GameServer.gInstance = new GameServer();
         }
 
@@ -33,7 +35,7 @@ class GameServer {
     }
 
     CreateSchemas() {
-        DatabaseManager.GetInstance().CreateSchemas();        
+        DatabaseManager.GetInstance().CreateSchemas();
     }
 
     async LoadProtos() {
@@ -44,7 +46,7 @@ class GameServer {
             // protobuf 객체를 생성
             const root = new protobuf.Root();
             // protobuf를 이용해 proto를 로드
-            await Promise.all(protoFiles.map((file: any) => root.load(file)));            
+            await Promise.all(protoFiles.map((file: any) => root.load(file)));
 
             for (const [pacakageName, types] of Object.entries(packetNames)) {
                 this.protoMessages[pacakageName] = {};
@@ -88,6 +90,27 @@ class GameServer {
         socket.on("data", OnData(socket));
         socket.on("end", OnEnd(socket));
         socket.on("error", OnError(socket));
+    }
+
+    AddUser(uuid: any, socket: any) {
+        const user = new User(uuid, socket);
+        this.userSessions.push(user);
+        return user;
+    }
+
+    RemoveUser(socket: any) {
+        const index = this.userSessions.findIndex((user) => user.socket === socket);
+        if (index !== -1) {
+            return this.userSessions.splice(index, 1)[0];
+        }
+    }
+
+    GetUserByID(id: any) {
+        return this.userSessions.find((user) => user.id === id);
+    }
+
+    GetUserBySocket(socket: any) {
+        return this.userSessions.find((user) => user.socket === socket);
     }
 }
 
