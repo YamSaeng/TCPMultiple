@@ -1,0 +1,9 @@
+export const TOTAL_LENGTH = 4;
+export const PACKET_TYPE_LENGTH = 1;
+
+export const PACKET_TYPE = {
+    PACKET_TYPE_PING: 0,
+    PACKET_TYPE_NORMAL: 1,
+    PACKET_TYPE_GAME_START: 2,
+    PACKET_TYPE_LOCATION: 3
+};
