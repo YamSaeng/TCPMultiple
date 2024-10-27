@@ -1,6 +1,8 @@
 import { config } from "../config/Config.js";
 import { PACKET_TYPE, TOTAL_LENGTH } from "../constants/PacketType.js";
 import DatabaseManager from "../Managers/DatabaseManager.js";
+import { GetHandlerById } from "../server/handlers/Handlers.js";
+import { PacketParser } from "../server/packet/PacketParser.js";
 import GameServer from "../server/Server.js";
 
 export const OnData = (socket: any) => async (data: any) => {
@@ -24,12 +26,6 @@ export const OnData = (socket: any) => async (data: any) => {
             // 다음 패킷을 받기 위해 나머지 부분을 잘라 socket buffer에 저장
             socket.buffer = socket.buffer.slice(length);
 
-            const user = DatabaseManager.GetInstance().GetUserBySocket(socket);
-            if (!user) {
-                console.log("OnData user를 찾을 수 없음");
-                return;
-            }
-
             try {
                 switch (packetType) {
                     case PACKET_TYPE.PING:
@@ -38,13 +34,34 @@ export const OnData = (socket: any) => async (data: any) => {
 
                         const pingMessage = pingProto.decode(packet);
 
-                        user.HandlePong(pingMessage);
+                        const pingUser = GameServer.GetInstance().GetUserBySocket(socket);
+                        if (!pingUser) {
+                            console.log("OnData user를 찾을 수 없음");
+                            return;
+                        }
+
+                        pingUser.HandlePong(pingMessage);
+                        break;
+                    case PACKET_TYPE.NORMAL:
+                        const { handlerId, userId, payload } = PacketParser(packet) as { handlerId: number; userId: any; payload: any };
+
+                        const normalUser = GameServer.GetInstance().GetUserById(userId);
+                        if (!normalUser) {
+                            console.log("OnData user를 찾을 수 없음");
+                            return;
+                        }
+
+                        const handler = GetHandlerById(handlerId);
+                        await handler?.({ socket, userId, payload });
                         break;
                 }
-            }
-            catch (error) {
+            } catch (error) {
                 console.log("OnData Error", error);
             }
+        }
+        else {
+            // 아직 전체 패킷이 도착하지 않음
+            break;
         }
     }
 }
