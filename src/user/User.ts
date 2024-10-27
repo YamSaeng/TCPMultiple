@@ -17,11 +17,19 @@ class User {
         this.latency = 0;
     }
 
-    ping(){
+    Ping(){
         const now = Date.now();
 
         console.log(`${this.id}: ping`);
         this.socket.write(CreatePingPacket(now));
+    }
+
+    HandlePong(data: any)
+    {
+        const now = Date.now();
+
+        this.latency = (now - data.timestamp) / 2;
+        console.log(`Receive pong user ${this.id} at ${now} with latency ${this.latency}ms`);
     }
 }
 
