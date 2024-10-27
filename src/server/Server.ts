@@ -105,7 +105,7 @@ class GameServer {
         }
     }
 
-    GetUserByID(id: any) {
+    GetUserById(id: any) {
         return this.userSessions.find((user) => user.id === id);
     }
 

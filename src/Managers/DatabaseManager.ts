@@ -73,16 +73,16 @@ class DatabaseManager {
         }
     }
 
-    async FindUserByDeviceID(deviceID: string) {
-        const [rows] = await this.pools["USER_DB"].query(USER_SQL_QUERIES.FIND_USER_BY_DEVICE_ID, [deviceID]);
+    async FindUserByDeviceId(deviceId: string) {
+        const [rows] = await this.pools["USER_DB"].query(USER_SQL_QUERIES.FIND_USER_BY_DEVICE_ID, [deviceId]);
         return rows[0];
     }
 
-    async CreateUser(deviceID: string){
+    async CreateUser(deviceId: string){
         const id = uuidv4();
-        await this.pools["USER_DB"].query(USER_SQL_QUERIES.CREATE_USER, [id,deviceID]);
+        await this.pools["USER_DB"].query(USER_SQL_QUERIES.CREATE_USER, [id,deviceId]);
 
-        return { id, deviceID };
+        return { id, deviceId };
     }
 
     async UpdateUserLogin(id:string){
