@@ -11,5 +11,8 @@ export const packetNames = {
     },
     response: {
         Response: "response.Response"
+    },
+    responseGame: {
+        LocationUpdate: "responseGame.LocationUpdate"
     }
 }
