@@ -34,6 +34,10 @@ class GameServer {
         this.server = net.createServer(this.Accept);
     }
 
+    TestAllDBConnection(){
+        DatabaseManager.GetInstance().TestAllDBConnection();
+    }
+
     CreateSchemas() {
         DatabaseManager.GetInstance().CreateSchemas();
     }
@@ -68,6 +72,7 @@ class GameServer {
     StartGameServer() {
         console.log("게임서버 시작");
 
+        this.TestAllDBConnection();
         this.CreateSchemas();
         this.LoadProtos();
 
