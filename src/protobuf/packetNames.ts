@@ -6,8 +6,8 @@ export const packetNames = {
     gameInitial: {
         GameInitialPacket: "gameInitial.GameInitialPacket"
     },
-    game: {
-        LocationUpdatePayload: "game.LocationUpdatePayload"
+    requestGame: {
+        LocationUpdatePayload: "requestGame.LocationUpdatePayload"
     },
     response: {
         Response: "response.Response"
