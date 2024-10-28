@@ -43,13 +43,7 @@ export const OnData = (socket: any) => async (data: any) => {
                         pingUser.HandlePong(pingMessage);
                         break;
                     case PACKET_TYPE.NORMAL:
-                        const { handlerId, userId, payload } = PacketParser(packet) as { handlerId: number; userId: any; payload: any };
-
-                        const normalUser = GameServer.GetInstance().GetUserById(userId);
-                        if (!normalUser) {
-                            console.log("OnData user를 찾을 수 없음");
-                            return;
-                        }
+                        const { handlerId, userId, payload } = PacketParser(packet) as { handlerId: number; userId: any; payload: any };                      
 
                         const handler = GetHandlerById(handlerId);
                         await handler?.({ socket, userId, payload });
