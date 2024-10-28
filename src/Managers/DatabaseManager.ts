@@ -61,6 +61,19 @@ class DatabaseManager {
         }
     }
 
+    async TestDBConnection(pool: any, dbName: string) {
+        try {
+            const [rows] = await pool.query("SELECT 1 + 1 AS solution");
+            console.log(`${dbName} 테스트 쿼리 결과:`, rows[0].solution);
+        } catch (error) {
+            console.error(`${dbName} 테스트 쿼리 실행 중 오류 발생`, error);
+        }
+    }
+
+    async TestAllDBConnection() {
+        this.TestDBConnection(this.pools.USER_DB, "USER_DB");
+    }
+
     async CreateSchemas() {
         const sqlDir = FileParser.GetInstance().GetDir("db/sql");
         try {
@@ -78,14 +91,14 @@ class DatabaseManager {
         return rows[0];
     }
 
-    async CreateUser(deviceId: string){
+    async CreateUser(deviceId: string) {
         const id = uuidv4();
-        await this.pools["USER_DB"].query(USER_SQL_QUERIES.CREATE_USER, [id,deviceId]);
+        await this.pools["USER_DB"].query(USER_SQL_QUERIES.CREATE_USER, [id, deviceId]);
 
         return { id, deviceId };
     }
 
-    async UpdateUserLogin(id:string){
+    async UpdateUserLogin(id: string) {
         await this.pools["USER_DB"].query(USER_SQL_QUERIES.UPDATE_USER_LOGIN, [id]);
     }
 
