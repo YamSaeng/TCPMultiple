@@ -13,12 +13,9 @@ const LocationUpdateHandler = async ({ socket, userId, payload }: { socket: any;
 
         locationUpdateUser.UpdatePosition(x, y);
 
-        const usersLocation = GameServer.GetInstance().GetAllUserLocation(userId);
-        if(usersLocation !== null)
-        {
-            const usersLocationPacket = CreateUserLocationPacket(usersLocation);
-            socket.write(usersLocationPacket);
-        }                
+        const usersLocation = GameServer.GetInstance().GetAllUserLocation(userId);        
+        const usersLocationPacket = CreateUserLocationPacket(usersLocation);
+        socket.write(usersLocationPacket);
     }
     catch (error) {
         console.error("LocationUpdate Handler ", error);
