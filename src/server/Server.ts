@@ -34,7 +34,7 @@ class GameServer {
         this.server = net.createServer(this.Accept);
     }
 
-    TestAllDBConnection(){
+    TestAllDBConnection() {
         DatabaseManager.GetInstance().TestAllDBConnection();
     }
 
@@ -108,6 +108,29 @@ class GameServer {
         if (index !== -1) {
             return this.userSessions.splice(index, 1)[0];
         }
+    }
+
+    GetAllUserLocation(exceptId: string) {
+        const usersLocation : any = [];
+
+        this.userSessions.forEach(user => {
+            if(user.id !== exceptId)
+            {
+                usersLocation.push({
+                    id:user.id,
+                    playerId: user.playerId,
+                    x: user.x,
+                    y: user.y
+                });
+            }
+        });
+
+        if(usersLocation.length > 0)
+        {
+            return usersLocation; 
+        }
+        
+        return null;
     }
 
     GetUserById(id: any) {
