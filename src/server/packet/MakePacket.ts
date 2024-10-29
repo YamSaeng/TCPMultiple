@@ -16,8 +16,7 @@ const MakePacket = (message: any, type: number) => {
     return Buffer.concat([packetLength, packetType, message]);
 }
 
-export const CreateUserLocationPacket = (users : any) => {
-    const protoMessages = GameServer.GetInstance().GetProtoMessages();
+export const CreateUserLocationPacket = (protoMessages: any, users: any) => {
     const allLocationProto = protoMessages.responseGame.LocationUpdate;
 
     const payload = { users };
@@ -27,9 +26,7 @@ export const CreateUserLocationPacket = (users : any) => {
     return MakePacket(s2cAllLocationPacket, PACKET_TYPE.LOCATION);
 }
 
-export const CreatePingPacket = (timestamp: number) => {
-    const protoMessages = GameServer.GetInstance().GetProtoMessages();
-
+export const CreatePingPacket = (protoMessages: any, timestamp: number) => {
     const pingProto = protoMessages.common.Ping;
 
     const payload = { timestamp };
