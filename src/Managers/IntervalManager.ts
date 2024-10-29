@@ -1,16 +1,8 @@
-class IntervalManager {
-    private static gInstance: any = null;
+class IntervalManager {    
     private intervals: any;
-    private serverIntervals : any;
-    static GetInstance() {
-        if (IntervalManager.gInstance == null) {
-            IntervalManager.gInstance = new IntervalManager();
-        }
+    private serverIntervals : any;    
 
-        return IntervalManager.gInstance;
-    }
-
-    private constructor() {
+    constructor() {
         this.intervals = new Map();
         this.serverIntervals = new Map();
     }
