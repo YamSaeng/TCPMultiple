@@ -98,6 +98,11 @@ class DatabaseManager {
         return { id, deviceId };
     }
 
+    async RemoveUser(user : any)
+    {
+        await this.pools["USER_DB"].query(USER_SQL_QUERIES.REMOVE_USER, [user.GetPositionX(), user.GetPositionY(), user.GetId()]);
+    }
+
     async UpdateUserLogin(id: string) {
         await this.pools["USER_DB"].query(USER_SQL_QUERIES.UPDATE_USER_LOGIN, [id]);
     }
