@@ -75,7 +75,7 @@ class DatabaseManager {
     }
 
     async CreateSchemas() {
-        const sqlDir = FileParser.GetInstance().GetDir("db/sql");
+        const sqlDir = FileParser.GetInstance().GetDir("../src/utils/db/sql");
         try {
             await this.ExecuteSqlFile(this.pools["USER_DB"], path.join(sqlDir, "userDB.sql"));
 
