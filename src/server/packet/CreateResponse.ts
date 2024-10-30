@@ -7,12 +7,17 @@ export const CreateResponse = (handlerId: any, responseCode: any, data :any = nu
     // response proto 구조를 가져옴
     const responseProto = protoMessages.response.Response;
 
+    const gameInitialProto = protoMessages.gameInitial.GameInitialPacket;
+    
+    const gameInitDataEncode = gameInitialProto.encode(data).finish();
+
+    //data: data ? Buffer.from(JSON.stringify(data)) : null
     // 응답 데이터 생성
     const responsePayload = {
         handlerId,
         responseCode,
         timestamp: Date.now(),
-        data: data ? Buffer.from(JSON.stringify(data)) : null
+        data : data ? gameInitDataEncode : null  
     };
 
     // response proto 구조로 인코딩
