@@ -8,6 +8,8 @@ import FileParser from "../FileParser.js";
 import { packetNames } from "../protobuf/packetNames.js";
 import DatabaseManager from "../Managers/DatabaseManager.js";
 import User from "../user/User.js";
+import IntervalManager from "../Managers/IntervalManager.js";
+import { CreatePingPacket } from "./packet/MakePacket.js";
 
 class GameServer {
     private static gInstance: any = null;
@@ -18,7 +20,9 @@ class GameServer {
 
     private protoMessages: { [key: string]: any } = {};
 
-    private userSessions: any[] = [];
+    private userSessions: any[] = [];    
+
+    private intervalManager: any;
 
     static GetInstance() {
         if (GameServer.gInstance == null) {
@@ -31,7 +35,8 @@ class GameServer {
     private constructor() {
         this.recvCount = 0;
         this.sendCount = 0;
-        this.server = net.createServer(this.Accept);
+        this.server = net.createServer(this.Accept);  
+        this.intervalManager = new IntervalManager();      
     }
 
     TestAllDBConnection() {
@@ -44,7 +49,9 @@ class GameServer {
 
     async LoadProtos() {
         try {
-            const protoFilesDir = FileParser.GetInstance().GetDir("./protobuf");
+            // src에 protobuf 넣기
+            const protoFilesDir = FileParser.GetInstance().GetDir("../src/protobuf");
+            //const protoFilesDir = FileParser.GetInstance().GetDir("./protobuf");            
             const protoFiles = FileParser.GetInstance().GetAllFiles(protoFilesDir, ".proto");
 
             // protobuf 객체를 생성
@@ -77,7 +84,16 @@ class GameServer {
         this.LoadProtos();
 
         this.Listen();
+        
+        this.intervalManager.AddIntervalForServer(0, this.ServerPrint.bind(this), 1000);                
     }
+
+    ServerPrint() {
+        console.log(`[User] : ${this.userSessions.length}
+            `);
+
+        this.sendCount = 0;
+    }    
 
     Listen() {
         this.server.listen(config.gameserver.port, config.gameserver.host, () => {
@@ -94,11 +110,20 @@ class GameServer {
 
         socket.on("data", OnData(socket));
         socket.on("end", OnEnd(socket));
-        socket.on("error", OnError(socket));
-    }
+        socket.on("error", OnError(socket));        
+    }    
 
-    AddUser(uuid: any, socket: any) {
+    AddUser(uuid: any, socket: any, x: number = 0, y: number = 0) {
         const user = new User(uuid, socket);
+
+        if (x !== 0) {
+            user.SetPositionX(x);
+        }
+
+        if (y !== 0) {
+            user.SetPositionY(y);
+        }
+
         this.userSessions.push(user);
         return user;
     }
@@ -111,13 +136,12 @@ class GameServer {
     }
 
     GetAllUserLocation(exceptId: string) {
-        const usersLocation : any = [];
+        const usersLocation: any = [];
 
         this.userSessions.forEach(user => {
-            if(user.id !== exceptId)
-            {
+            if (user.id !== exceptId) {
                 usersLocation.push({
-                    id:user.id,
+                    id: user.id,
                     playerId: user.playerId,
                     x: user.x,
                     y: user.y
@@ -125,11 +149,10 @@ class GameServer {
             }
         });
 
-        if(usersLocation.length > 0)
-        {
-            return usersLocation; 
+        if (usersLocation.length > 0) {
+            return usersLocation;
         }
-        
+
         return null;
     }
 
