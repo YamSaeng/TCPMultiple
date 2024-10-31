@@ -171,7 +171,27 @@ class Client {
                 const packetType = data.readUInt8(4);
                 const packet = data.slice(totalHeaderLength, totalHeaderLength + length);
 
-                switch (packetType) {                    
+                switch (packetType) {       
+                    case PACKET_TYPE.PING:
+                        const pingProto = protoMessages.common.Ping;
+
+                        const now = Date.now();
+
+                        const payload = { timestamp: now };
+
+                        const message = pingProto.create(payload);
+
+                        const c2sPongProto = pingProto.encode(message).finish();
+                        const pongPacketLength = Buffer.alloc(config.packet.totalLength);                                        
+                        
+                        pongPacketLength.writeUInt32BE(c2sPongProto.length + TOTAL_LENGTH + PACKET_TYPE_LENGTH, 0);
+                
+                        const packetType = Buffer.alloc(PACKET_TYPE_LENGTH);
+                        packetType.writeUInt8(PACKET_TYPE.PING, 0);
+                
+                        const packetWithLength = Buffer.concat([pongPacketLength, packetType, c2sPongProto]);
+                        this.clientSocket.write(packetWithLength);
+                        break;             
                     case PACKET_TYPE.NORMAL:
                         const Response = protoMessages.response.Response;
                         const gameInitialProto = protoMessages.gameInitial.GameInitialPacket;
@@ -218,7 +238,7 @@ async function DummyClientCreate(count: number) {
 }
 
 // 백프레셔 현상
-DummyClientCreate(1).then(async (data) => {
+DummyClientCreate(50).then(async (data) => {
     console.log("완료");    
 
     // await delay(5000);
