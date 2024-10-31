@@ -20,7 +20,7 @@ class GameServer {
 
     private protoMessages: { [key: string]: any } = {};
 
-    private userSessions: any[] = [];    
+    private userSessions: any[] = [];
 
     private intervalManager: any;
 
@@ -35,8 +35,8 @@ class GameServer {
     private constructor() {
         this.recvCount = 0;
         this.sendCount = 0;
-        this.server = net.createServer(this.Accept);  
-        this.intervalManager = new IntervalManager();      
+        this.server = net.createServer(this.Accept);
+        this.intervalManager = new IntervalManager();
     }
 
     TestAllDBConnection() {
@@ -84,8 +84,9 @@ class GameServer {
         this.LoadProtos();
 
         this.Listen();
-        
-        this.intervalManager.AddIntervalForServer(0, this.ServerPrint.bind(this), 1000);                
+
+        this.intervalManager.AddIntervalForServer(0, this.ServerPrint.bind(this), 1000);
+        this.intervalManager.AddIntervalForServer(1, this.UserPingPacketSend.bind(this), 1000);
     }
 
     ServerPrint() {
@@ -93,7 +94,30 @@ class GameServer {
             `);
 
         this.sendCount = 0;
-    }    
+    }
+
+    UserPingPacketSend() {
+        for (let i = 0; i < this.userSessions.length; i++) {
+
+            const user = this.userSessions[i];
+
+            console.log(`[${user.id}: ping Send] [pong Count : ${user.pongCount}]`);
+
+            const now = Date.now();
+
+            if (user.pongCount >= config.gameserver.pongCount) {
+                user.GetSocket().end();
+
+                OnEnd(user.GetSocket());                
+                continue;
+            }
+
+            user.pongCount++;
+
+            const PingPacket = CreatePingPacket(this.protoMessages, now);
+            user.GetSocket().write(PingPacket);
+        }        
+    }
 
     Listen() {
         this.server.listen(config.gameserver.port, config.gameserver.host, () => {
@@ -110,8 +134,8 @@ class GameServer {
 
         socket.on("data", OnData(socket));
         socket.on("end", OnEnd(socket));
-        socket.on("error", OnError(socket));        
-    }    
+        socket.on("error", OnError(socket));
+    }
 
     AddUser(uuid: any, socket: any, x: number = 0, y: number = 0) {
         const user = new User(uuid, socket);
