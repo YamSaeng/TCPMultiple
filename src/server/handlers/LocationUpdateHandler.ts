@@ -1,3 +1,4 @@
+import { config } from "../../config/Config.js";
 import { CreateUserLocationPacket } from "../packet/MakePacket.js";
 import GameServer from "../Server.js";
 
@@ -15,7 +16,11 @@ const LocationUpdateHandler = async ({ socket, userId, payload }: { socket: any;
         const protoMessages = GameServer.GetInstance().GetProtoMessages();
         const usersLocation = GameServer.GetInstance().GetAllUserLocation(userId);
         const usersLocationPacket = CreateUserLocationPacket(protoMessages, usersLocation);
-        socket.write(usersLocationPacket);
+
+        if(locationUpdateUser.pongCount < config.gameserver.pongCount)
+        {
+            socket.write(usersLocationPacket);            
+        }        
     }
     catch (error) {
         console.error("LocationUpdate Handler ", error);
