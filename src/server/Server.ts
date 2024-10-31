@@ -164,6 +164,8 @@ class GameServer {
 
         this.userSessions.forEach(user => {
             if (user.id !== exceptId) {
+                user.CaculatePosition();
+
                 usersLocation.push({
                     id: user.id,
                     playerId: user.playerId,
