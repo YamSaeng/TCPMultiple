@@ -86,6 +86,20 @@ class User {
         this.y = y;
         this.lastUpdateTime = Date.now();
     }
+
+    CaculatePosition()
+    {
+        const timeDiff = this.latency / 1000;
+        const speed = 1;
+        const distance = speed * timeDiff;
+
+        this.x = this.x + distance;
+        this.y = this.y + distance;
+        return {
+            x: this.x,
+            y: this.y
+        }
+    }
 }
 
 export default User;
