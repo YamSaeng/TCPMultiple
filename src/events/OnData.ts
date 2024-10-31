@@ -28,19 +28,19 @@ export const OnData = (socket: any) => async (data: any) => {
 
             try {
                 switch (packetType) {
-                    case PACKET_TYPE.PING:
+                    case PACKET_TYPE.PING:                        
                         const protoMessages = GameServer.GetInstance().GetProtoMessages();
                         const pingProto = protoMessages.common.Ping;
 
-                        const pingMessage = pingProto.decode(packet);
+                        const pongMessage = pingProto.decode(packet);
 
-                        const pingUser = GameServer.GetInstance().GetUserBySocket(socket);
-                        if (!pingUser) {
-                            console.log("OnData user를 찾을 수 없음");
-                            return;
+                        const pongUser = GameServer.GetInstance().GetUserBySocket(socket);
+                        if (!pongUser) {
+                             console.log("OnData user를 찾을 수 없음");
+                             return;
                         }
-
-                        pingUser.HandlePong(pingMessage);
+                        
+                        pongUser.HandlePong(pongMessage);                                                                        
                         break;
                     case PACKET_TYPE.NORMAL:
                         const { handlerId, userId, payload } = PacketParser(packet) as { handlerId: number; userId: any; payload: any };                      
