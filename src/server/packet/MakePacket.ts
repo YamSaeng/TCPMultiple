@@ -16,6 +16,7 @@ const MakePacket = (message: any, type: number) => {
     return Buffer.concat([packetLength, packetType, message]);
 }
 
+// 위치 응답 패킷 생성
 export const CreateUserLocationPacket = (protoMessages: any, users: any) => {
     const allLocationProto = protoMessages.responseGame.LocationUpdate;
 
