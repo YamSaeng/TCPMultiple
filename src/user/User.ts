@@ -25,7 +25,7 @@ class User {
     HandlePong(data: any) {
         const now = Date.now();
 
-        this.latency = (now - data.timestamp) / 2;
+        this.latency = Math.abs((now - data.timestamp) / 2);
         console.log(`Receive pong user ${this.id} latency ${this.latency}ms`);
 
         this.pongCount = 0;
