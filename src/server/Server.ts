@@ -113,6 +113,8 @@ class GameServer {
 
             const now = Date.now();
 
+            // pongCount가 일정 횟수 이상 많아지면
+            // 해당 유저는 접속이 끊겼다고 판단 하고 접속 종료
             if (user.pongCount >= config.gameserver.pongCount) {
                 user.GetSocket().end();
 
@@ -177,8 +179,10 @@ class GameServer {
 
         this.userSessions.forEach(user => {
             if (user.id !== exceptId) {
+                // 추측항법 으로 latency에 따라 좌표 계산
                 user.CaculatePosition();
 
+                // 계산한 좌표를 가져옴
                 usersLocation.push({
                     id: user.id,
                     playerId: user.playerId,
