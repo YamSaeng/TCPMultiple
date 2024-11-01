@@ -7,6 +7,7 @@ import { FormatDate } from "../utils/DateFormatter.js";
 import { config } from "../config/Config.js";
 import { USER_SQL_QUERIES } from "../utils/db/user/UserQueries.js";
 
+// DB Manager
 class DatabaseManager {
     private static gInstance: any = null;
     public pools: { [key: string]: any } = {};
@@ -19,6 +20,7 @@ class DatabaseManager {
         return DatabaseManager.gInstance;
     }
 
+    // 풀 생성
     CreatePool(poolName: string, dbConfig: any) {
         const pool = mysql.createPool({
             host: dbConfig.host,
@@ -91,6 +93,7 @@ class DatabaseManager {
         return rows[0];
     }
 
+    // 유저 생성해서 DB에 저장
     async CreateUser(deviceId: string) {
         const id = uuidv4();
         await this.pools["USER_DB"].query(USER_SQL_QUERIES.CREATE_USER, [id, deviceId]);
@@ -98,11 +101,13 @@ class DatabaseManager {
         return { id, deviceId };
     }
 
+    // DB에서 유저 삭제
     async RemoveUser(user : any)
     {
         await this.pools["USER_DB"].query(USER_SQL_QUERIES.REMOVE_USER, [user.GetPositionX(), user.GetPositionY(), user.GetId()]);
     }
 
+    // 유저 로그인 시간 업데이트
     async UpdateUserLogin(id: string) {
         await this.pools["USER_DB"].query(USER_SQL_QUERIES.UPDATE_USER_LOGIN, [id]);
     }
