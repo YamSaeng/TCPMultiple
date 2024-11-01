@@ -1,3 +1,4 @@
+// setInterval을 관리
 class IntervalManager {    
     private intervals: any;
     private serverIntervals : any;    
@@ -7,6 +8,7 @@ class IntervalManager {
         this.serverIntervals = new Map();
     }
 
+    // 서버용
     AddIntervalForServer(intervalId: number, callback: any, interval: any, type = "server") {
         if(!this.serverIntervals.has(intervalId))
         {
@@ -18,6 +20,7 @@ class IntervalManager {
         );
     }
 
+    // 플레이어용
     AddIntervalForPlayer(playerId: number, callback: any, interval: any, type = "user") {
         if (!this.intervals.has(playerId)) {
             this.intervals.set(playerId, new Map());
