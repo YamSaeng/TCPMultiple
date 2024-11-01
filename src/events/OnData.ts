@@ -1,6 +1,5 @@
 import { config } from "../config/Config.js";
 import { PACKET_TYPE, TOTAL_LENGTH } from "../constants/PacketType.js";
-import DatabaseManager from "../Managers/DatabaseManager.js";
 import { GetHandlerById } from "../server/handlers/Handlers.js";
 import { PacketParser } from "../server/packet/PacketParser.js";
 import GameServer from "../server/Server.js";
@@ -28,10 +27,12 @@ export const OnData = (socket: any) => async (data: any) => {
 
             try {
                 switch (packetType) {
+                    // 핑 패킷 처리
                     case PACKET_TYPE.PING:                        
                         const protoMessages = GameServer.GetInstance().GetProtoMessages();
                         const pingProto = protoMessages.common.Ping;
 
+                        // 클라가 보낸 핑 패킷 디코딩
                         const pongMessage = pingProto.decode(packet);
 
                         const pongUser = GameServer.GetInstance().GetUserBySocket(socket);
