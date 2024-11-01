@@ -79,16 +79,23 @@ class GameServer {
     StartGameServer() {
         console.log("게임서버 시작");
 
+        // 서버에서 사용하는 DB에 연결이 잘되어 있는지 확인
         this.TestAllDBConnection();
+        // sql 생성
         this.CreateSchemas();
+        // proto 로딩
         this.LoadProtos();
 
+        // lisen 시작
         this.Listen();
 
+        // 서버 정보를 1초마다 출력
         this.intervalManager.AddIntervalForServer(0, this.ServerPrint.bind(this), 1000);
+        // 핑 패킷을 1초마다 전송
         this.intervalManager.AddIntervalForServer(1, this.UserPingPacketSend.bind(this), 1000);
     }
 
+    // 서버 정보 출력
     ServerPrint() {
         console.log(`[User] : ${this.userSessions.length}
             `);
@@ -96,12 +103,13 @@ class GameServer {
         this.sendCount = 0;
     }
 
+    // 서버에 접속중인 유저들에게 핑 패킷 전송
     UserPingPacketSend() {
         for (let i = 0; i < this.userSessions.length; i++) {
 
             const user = this.userSessions[i];
 
-            console.log(`[${user.id}: ping Send] [pong Count : ${user.pongCount}]`);
+            //console.log(`[${user.id}: ping Send] [pong Count : ${user.pongCount}]`);
 
             const now = Date.now();
 
@@ -119,6 +127,7 @@ class GameServer {
         }        
     }
 
+    // 서버 리슨
     Listen() {
         this.server.listen(config.gameserver.port, config.gameserver.host, () => {
             console.log(`서버가 ${config.gameserver.host}:${config.gameserver.port}에서 실행 중입니다.`);
@@ -126,6 +135,7 @@ class GameServer {
         });
     }
 
+    // 클라 접속을 처리하고 이벤트 할당
     Accept(socket: any) {
         console.log("클라 접속", socket.remoteAddress, socket.remotePort);
 
@@ -137,6 +147,7 @@ class GameServer {
         socket.on("error", OnError(socket));
     }
 
+    // 유저 생성
     AddUser(uuid: any, socket: any, x: number = 0, y: number = 0) {
         const user = new User(uuid, socket);
 
@@ -152,6 +163,7 @@ class GameServer {
         return user;
     }
 
+    // 유저 제거
     RemoveUser(socket: any) {
         const index = this.userSessions.findIndex((user) => user.socket === socket);
         if (index !== -1) {
@@ -159,6 +171,7 @@ class GameServer {
         }
     }
 
+    // exceptId를 제외한 유저들의 위치를 계산해 반환
     GetAllUserLocation(exceptId: string) {
         const usersLocation: any = [];
 
@@ -182,7 +195,7 @@ class GameServer {
         return null;
     }
 
-    GetUserById(id: any) {
+    GetUserById(id: string) {
         return this.userSessions.find((user) => user.id === id);
     }
 
