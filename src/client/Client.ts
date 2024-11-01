@@ -175,9 +175,9 @@ class Client {
                     case PACKET_TYPE.PING:
                         const pingProto = protoMessages.common.Ping;
 
-                        const now = Date.now();
+                        const responsePingData = pingProto.decode(packet);                                                
 
-                        const payload = { timestamp: now };
+                        const payload = { timestamp: responsePingData.timestamp };
 
                         const message = pingProto.create(payload);
 
@@ -232,13 +232,12 @@ async function DummyClientCreate(count: number) {
         DummyClients.push(dummyClient);
 
         dummyClient.Connect();
-        await delay(100);
-        //dummyClient.Close();  
+        await delay(100);        
     }
 }
 
 // 백프레셔 현상
-DummyClientCreate(50).then(async (data) => {
+DummyClientCreate(100).then(async (data) => {
     console.log("완료");    
 
     // await delay(5000);
